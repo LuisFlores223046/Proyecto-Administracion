@@ -8,7 +8,6 @@ Versión: 1.0
 """
 from django.apps import AppConfig
 
-
 class InventarioConfig(AppConfig):
     """
     Configuración de la aplicación inventario.

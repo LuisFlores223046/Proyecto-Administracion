@@ -9,7 +9,6 @@ Versión: 1.0
 """
 from django.db import models
 
-
 class Equipo(models.Model):
     """
     Representa una herramienta o maquinaria disponible para renta.
