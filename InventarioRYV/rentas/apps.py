@@ -9,9 +9,9 @@ Versión: 1.0
 from django.apps import AppConfig
 
 
-class InicioConfig(AppConfig):
+class RentasConfig(AppConfig):
     """
-    Configuración de la aplicación inicio.
+    Configuración de la aplicación rentas.
 
     Registra la app dentro del proyecto Django y define
     sus parámetros básicos de configuración.
@@ -23,7 +23,6 @@ class InicioConfig(AppConfig):
         verbose_name (str): Nombre legible de la aplicación para el panel
         de administración de Django.
     """
-
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'inicio'
-    verbose_name = 'Inicio'
+    name = 'rentas'
+    verbose_name = 'Rentas'
