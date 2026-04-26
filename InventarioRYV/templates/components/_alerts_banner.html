@@ -1,0 +1,16 @@
+{% if alertas_vencidas or alertas_proximas %}
+<div class="alertas-barra" role="alert">
+    {% if alertas_vencidas %}
+    <span class="alertas-barra-item alertas-barra-item--urgente">
+        &#9888; {{ alertas_vencidas|length }} vencida{{ alertas_vencidas|length|pluralize:"s" }}
+        &mdash; <a href="{% url 'rentas:lista' %}" class="alertas-barra-enlace">Ver rentas</a>
+    </span>
+    {% endif %}
+    {% if alertas_proximas %}
+    <span class="alertas-barra-item alertas-barra-item--proxima">
+        &#9202; {{ alertas_proximas|length }} próxima{{ alertas_proximas|length|pluralize:"s" }} a vencer
+        &mdash; <a href="{% url 'rentas:lista' %}" class="alertas-barra-enlace">Ver rentas</a>
+    </span>
+    {% endif %}
+</div>
+{% endif %}
