@@ -1,7 +1,7 @@
 """
 Archivo: apps.py
-Descripción: Configuración de la aplicación de rentas para el sistema RYV Rentas.
-             Define los parámetros de registro de la app rentas dentro
+Descripción: Configuración de la aplicación de inicio para el sistema RYV Rentas.
+             Define los parámetros de registro de la app inicio dentro
              del proyecto Django.
 Fecha: 2026-04-07
 Versión: 1.0
