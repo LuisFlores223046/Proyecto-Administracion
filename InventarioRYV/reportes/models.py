@@ -1,58 +1,84 @@
 """
 Archivo: models.py
-Descripción: Modelos de autenticación para el sistema RYV Rentas.
-             Define el modelo de usuario personalizado que extiende
-             AbstractUser de Django, agregando el campo de rol para
-             el control de acceso definido en RF-03 y RN-008 del SRS.
-Fecha: 2026-04-07
+Descripción: Modelos para el módulo de reportes del sistema RYV Rentas.
+             Define el modelo ReporteGenerado que registra los metadatos
+             de los reportes PDF generados por el Administrador, permitiendo
+             su descarga posterior sin necesidad de regenerarlos desde cero,
+             según lo definido en RF-21 al RF-25 del SRS.
+Fecha: 2026-04-18
 Versión: 1.0
 """
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class Usuario(AbstractUser):
+class ReporteGenerado(models.Model):
     """
-    Usuario personalizado que extiende AbstractUser de Django.
+    Registro de metadatos de un reporte PDF generado por el Administrador.
 
-    Agrega el campo rol para diferenciar permisos entre Administrador
-    y Empleado dentro del sistema, siguiendo las reglas de acceso
-    definidas en RF-03 y RN-008 del SRS.
+    No almacena el archivo físico, solo la información necesaria para
+    identificarlo y regenerarlo bajo demanda desde el historial de reportes,
+    según lo definido en RF-25 del SRS.
 
     Atributos:
-        rol (str): Rol asignado al usuario. Puede ser 'administrador'
-        o 'empleado'. Por defecto es 'empleado'.
+        tipo (str): Tipo de reporte generado. Puede ser 'inventario'
+        o 'rentas' (rentas por periodo).
+        generado_por (Usuario): Usuario Administrador que generó el reporte.
+        fecha_generacion (datetime): Fecha y hora en que se generó el reporte.
+        periodo_inicio (date): Fecha de inicio del periodo cubierto por el reporte.
+        Solo aplica para reportes de tipo 'rentas'. Campo opcional.
+        periodo_fin (date): Fecha de fin del periodo cubierto por el reporte.
+        Solo aplica para reportes de tipo 'rentas'. Campo opcional.
+        archivo_nombre (str): Nombre descriptivo del archivo PDF generado.
     """
 
-    ROL_CHOICES = [
-        ('administrador', 'Administrador'),
-        ('empleado', 'Empleado'),
+    TIPO_CHOICES = [
+        ('inventario', 'Inventario'),
+        ('rentas', 'Rentas por periodo'),
     ]
-    rol = models.CharField(
+    tipo = models.CharField(
         max_length=20,
-        choices=ROL_CHOICES,
-        default='empleado',
-        verbose_name='rol',
+        choices=TIPO_CHOICES,
+        verbose_name='tipo de reporte',
+    )
+    generado_por = models.ForeignKey(
+        'authentication.Usuario',
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='generado por',
+    )
+    fecha_generacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='fecha de generación',
+    )
+    periodo_inicio = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='periodo inicio',
+    )
+    periodo_fin = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='periodo fin',
+    )
+    archivo_nombre = models.CharField(
+        max_length=200,
+        verbose_name='nombre de archivo',
     )
 
     class Meta:
-        verbose_name = 'usuario'
-        verbose_name_plural = 'usuarios'
+        verbose_name = 'reporte generado'
+        verbose_name_plural = 'reportes generados'
+        ordering = ['-fecha_generacion']
 
-    def es_administrador(self):
+    def __str__(self):
         """
-        Verifica si el usuario tiene rol de Administrador.
+        Retorna la representación en texto del reporte generado.
 
-        Returns:
-            bool: True si el rol del usuario es 'administrador', False en caso contrario.
+        Retorna:
+            str: Cadena con el tipo de reporte y la fecha y hora de generación
+            en formato YYYY-MM-DD HH:MM.
         """
-        return self.rol == 'administrador'
-
-    def es_empleado(self):
-        """
-        Verifica si el usuario tiene rol de Empleado.
-
-        Returns:
-            bool: True si el rol del usuario es 'empleado', False en caso contrario.
-        """
-        return self.rol == 'empleado'
+        return (
+            f"{self.get_tipo_display()} — "
+            f"{self.fecha_generacion.strftime('%Y-%m-%d %H:%M')}"
+        )

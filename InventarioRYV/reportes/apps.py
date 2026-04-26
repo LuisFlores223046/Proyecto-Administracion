@@ -3,7 +3,7 @@ Archivo: apps.py
 Descripción: Configuración de la aplicación de reportes para el sistema RYV Rentas.
              Define los parámetros de registro de la app reportes dentro
              del proyecto Django.
-Fecha: 2026-04-07
+Fecha: 2026-04-18
 Versión: 1.0
 """
 from django.apps import AppConfig

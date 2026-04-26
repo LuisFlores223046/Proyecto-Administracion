@@ -4,7 +4,7 @@ Descripción: Generadores de reportes PDF para el módulo de reportes del sistem
              Implementa la generación de reportes de inventario y rentas por periodo
              usando la librería ReportLab, según lo definido en RF-21, RF-22, RF-24
              y RN-012 del SRS.
-Fecha: 2026-04-07
+Fecha: 2026-04-25
 Versión: 1.0
 """
 from reportlab.lib.pagesizes import letter

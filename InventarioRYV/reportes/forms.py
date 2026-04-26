@@ -4,7 +4,7 @@ Descripción: Formularios para el módulo de reportes del sistema RYV Rentas.
              Define el formulario de selección de periodo para la generación
              de reportes de rentas, según lo definido en RF-22, RF-23
              y RN-012 del SRS.
-Fecha: 2026-04-07
+Fecha: 2026-04-21 
 Versión: 1.0
 """
 from django import forms
