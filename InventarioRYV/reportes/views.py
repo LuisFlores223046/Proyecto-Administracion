@@ -171,3 +171,83 @@ def generar_rentas(request):
             messages.error(request, 'Fechas inválidas.')
 
     return redirect('reportes:panel')
+
+
+@admin_required
+def descargar_pdf(request, pk):
+    """
+    Regenera y descarga un reporte PDF previamente registrado en el historial.
+
+    Recupera los metadatos del reporte y lo regenera con los datos actuales
+    del sistema, sin almacenar el archivo físico, según lo definido en
+    RF-25 y CU-25 del SRS.
+
+    Parámetros:
+        request (HttpRequest): Solicitud HTTP.
+        pk (int): Identificador único del reporte a descargar.
+
+    Retorna:
+        HttpResponse: Descarga directa del archivo PDF regenerado si es exitoso,
+        o redirige al historial de reportes con mensaje de error si falla,
+        o devuelve 404 si el reporte no existe.
+    """
+    reporte = get_object_or_404(ReporteGenerado, pk=pk)
+
+    try:
+        if reporte.tipo == 'inventario':
+            equipos = Equipo.objects.filter(
+                activo=True
+            ).order_by('nombre')
+            pdf_bytes = generar_pdf_inventario(equipos)
+        else:
+            rentas = Renta.objects.filter(
+                fecha_inicio__gte=reporte.periodo_inicio,
+                fecha_inicio__lte=reporte.periodo_fin,
+            ).select_related('equipo', 'cliente')
+            pdf_bytes = generar_pdf_rentas(
+                rentas,
+                reporte.periodo_inicio,
+                reporte.periodo_fin,
+            )
+
+        response = HttpResponse(
+            pdf_bytes, content_type='application/pdf'
+        )
+        response['Content-Disposition'] = (
+            f'attachment; filename="{reporte.archivo_nombre}"'
+        )
+        return response
+
+    except Exception:
+        messages.error(
+            request,
+            'Error al re-generar el reporte.',
+        )
+        return redirect('reportes:historial')
+
+
+@admin_required
+def historial_reportes(request):
+    """
+    Muestra el listado completo de reportes generados anteriormente.
+
+    Presenta todos los reportes registrados en el historial ordenados por
+    fecha de generación descendente, permitiendo identificarlos por tipo,
+    fecha y periodo cubierto, según lo definido en RF-25 y CU-26 del SRS.
+
+    Parámetros:
+        request (HttpRequest): Solicitud HTTP.
+
+    Retorna:
+        HttpResponse: Renderiza la plantilla reportes/historial.html con
+        el listado completo de reportes generados.
+    """
+    reportes = ReporteGenerado.objects.select_related(
+        'generado_por'
+    ).order_by('-fecha_generacion')
+
+    return render(
+        request,
+        'reportes/historial.html',
+        {'reportes': reportes},
+    )
