@@ -4,7 +4,7 @@ Descripción: Vistas para el módulo de reportes del sistema RYV Rentas.
              Gestiona la generación y descarga de reportes PDF de inventario
              y rentas por periodo, así como el historial de reportes generados,
              según lo definido en RF-21 al RF-25 y RN-012 del SRS.
-Fecha: 2026-04-07
+Fecha: 2026-04-26
 Versión: 1.0
 """
 import datetime
