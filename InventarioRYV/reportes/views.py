@@ -172,7 +172,6 @@ def generar_rentas(request):
 
     return redirect('reportes:panel')
 
-
 @admin_required
 def descargar_pdf(request, pk):
     """
