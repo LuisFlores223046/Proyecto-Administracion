@@ -3,7 +3,7 @@ Archivo: views.py
 Descripción: Vistas para el módulo de solicitudes del sistema RYV Rentas.
              Gestiona la consulta de solicitudes enviadas por el usuario
              autenticado, según lo definido en RF-27 y CU-18 del SRS.
-Fecha: 2026-05-09
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.shortcuts import render

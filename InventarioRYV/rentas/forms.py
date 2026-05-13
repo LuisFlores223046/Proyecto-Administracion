@@ -6,7 +6,7 @@ Descripción: Formularios para el módulo de rentas del sistema RYV Rentas.
              la función auxiliar para obtener equipos disponibles, según lo
              definido en RF-13, RF-14, RF-17, RF-18 y RN-005 del SRS.
 Fecha: 2026-04-07
-Versión: 2.0
+Versión: 1.0
 """
 from decimal import Decimal
 from django import forms

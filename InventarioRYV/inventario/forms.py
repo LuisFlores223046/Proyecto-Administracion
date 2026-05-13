@@ -4,7 +4,7 @@ Descripción: Formularios para el módulo de inventario del sistema RYV Rentas.
              Define los formularios de creación y edición de equipos, así como
              el formulario de solicitudes de cambio enviadas por el Empleado,
              según lo definido en RF-05 al RF-12 y RN-007, RN-008 del SRS.
-Fecha: 2026-04-12
+Fecha: 2026-04-07
 Versión: 1.0
 """
 

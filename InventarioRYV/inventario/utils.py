@@ -3,7 +3,7 @@ Archivo: utils.py
 Descripción: Funciones utilitarias para el módulo de inventario del sistema RYV Rentas.
              Provee funciones auxiliares para la gestión del estado de los equipos,
              según lo definido en RN-002 y RN-003 del SRS.
-Fecha: 2026-04-12
+Fecha: 2026-04-07
 Versión: 1.0
 """
 

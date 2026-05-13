@@ -160,6 +160,7 @@ def generar_rentas(request):
 
     return redirect('reportes:panel')
 
+
 @admin_required
 def comprobante_renta(request, pk):
     """

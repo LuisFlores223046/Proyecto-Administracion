@@ -5,7 +5,7 @@ Descripción: Modelos para el módulo de reportes del sistema RYV Rentas.
              de los reportes PDF generados por el Administrador, permitiendo
              su descarga posterior sin necesidad de regenerarlos desde cero,
              según lo definido en RF-21 al RF-25 del SRS.
-Fecha: 2026-04-18
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.db import models

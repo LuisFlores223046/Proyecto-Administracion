@@ -5,7 +5,7 @@ Descripción: Servicios para ejecutar las solicitudes aprobadas por el Administr
              al aprobar solicitudes del Empleado, incluyendo alta, edición y baja de
              equipos, así como el registro y cierre de rentas, según lo definido en
              RF-27, RN-002, RN-003 y RN-008 del SRS.
-Fecha: 2026-05-09
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.utils import timezone

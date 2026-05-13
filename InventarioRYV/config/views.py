@@ -4,7 +4,7 @@ Descripción: Vistas de manejo de errores HTTP para el sistema RYV Rentas.
              Gestiona las respuestas personalizadas para los errores 403,
              404 y 500, cumpliendo con RNF-010 del SRS que prohíbe exponer
              información técnica interna al usuario.
-Fecha: 2026-05-09
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.shortcuts import render

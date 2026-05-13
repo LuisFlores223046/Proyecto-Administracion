@@ -6,7 +6,7 @@ Descripción: Vistas para el módulo de rentas del sistema RYV Rentas.
              según lo definido en RF-13 al RF-19 y RN-001 al RN-005,
              RN-008 del SRS.
 Fecha: 2026-04-07
-Versión: 2.0
+Versión: 1.0
 """
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect

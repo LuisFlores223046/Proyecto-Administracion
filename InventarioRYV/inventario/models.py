@@ -4,10 +4,11 @@ Descripción: Modelos para el módulo de inventario del sistema RYV Rentas.
              Define el modelo Equipo que gestiona las herramientas y maquinaria
              disponibles para renta, incluyendo el control de disponibilidad
              por cantidades, según lo definido en RF-05 al RF-12 del SRS.
-Fecha: 2026-04-12
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.db import models
+
 
 class Equipo(models.Model):
     """

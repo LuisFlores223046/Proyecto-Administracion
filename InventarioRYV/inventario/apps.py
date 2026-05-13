@@ -3,10 +3,11 @@ Archivo: apps.py
 Descripción: Configuración de la aplicación de inventario para el sistema RYV Rentas.
              Define los parámetros de registro de la app inventario dentro
              del proyecto Django.
-Fecha: 2026-04-12
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.apps import AppConfig
+
 
 class InventarioConfig(AppConfig):
     """

@@ -5,7 +5,7 @@ Descripción: Modelos para el módulo de solicitudes del sistema RYV Rentas.
              entre el Empleado y el Administrador para cambios en inventario
              y rentas, según lo definido en RF-06, RF-08, RF-10, RF-12,
              RF-14, RF-18 y RN-008 del SRS.
-Fecha: 2026-05-09
+Fecha: 2026-04-07
 Versión: 1.0
 """
 from django.db import models

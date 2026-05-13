@@ -4,7 +4,7 @@ Descripción: Procesadores de contexto globales para el sistema RYV Rentas.
              Inyecta en todas las plantillas las alertas de vencimiento de rentas
              y el conteo de solicitudes pendientes, según lo definido en RF-19,
              RN-004 y CU-27 del SRS.
-Fecha: 2026-05-09
+Fecha: 2026-04-07
 Versión: 1.0
 """
 def alertas_globales(request):
