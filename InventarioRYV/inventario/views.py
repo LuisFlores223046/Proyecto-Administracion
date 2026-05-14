@@ -20,18 +20,16 @@ from solicitudes.models import Solicitud
 @empleado_o_admin
 def lista_inventario(request):
     """
-    Muestra el listado paginado de todos los equipos activos del inventario.
+    @brief Muestra el listado paginado de todos los equipos activos del inventario.
 
     Permite filtrar los resultados por nombre del equipo mediante el
     parámetro GET 'nombre', según lo definido en RF-07 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Puede incluir el parámetro
-        GET 'nombre' para filtrar equipos por nombre.
+    @param request HttpRequest Solicitud HTTP. Puede incluir el parámetro
+    GET 'nombre' para filtrar equipos por nombre.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla inventario/lista.html con
-        el listado paginado de equipos y el filtro activo.
+    @return HttpResponse Renderiza la plantilla inventario/lista.html con
+    el listado paginado de equipos y el filtro activo.
     """
     equipos = Equipo.objects.filter(activo=True)
 
@@ -53,19 +51,17 @@ def lista_inventario(request):
 @empleado_o_admin
 def disponibles_view(request):
     """
-    Muestra el listado paginado de equipos con al menos una unidad disponible.
+    @brief Muestra el listado paginado de equipos con al menos una unidad disponible.
 
     Calcula la disponibilidad en la base de datos mediante anotación para
     evitar cargar todos los equipos en memoria. Permite filtrar por nombre,
     según lo definido en RF-07 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Puede incluir el parámetro
-        GET 'nombre' para filtrar equipos por nombre.
+    @param request HttpRequest Solicitud HTTP. Puede incluir el parámetro
+    GET 'nombre' para filtrar equipos por nombre.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla inventario/disponibles.html
-        con el listado paginado de equipos disponibles y el filtro activo.
+    @return HttpResponse Renderiza la plantilla inventario/disponibles.html
+    con el listado paginado de equipos disponibles y el filtro activo.
     """
     equipos = Equipo.objects.filter(activo=True).annotate(
         calc_disp=ExpressionWrapper(
@@ -94,18 +90,16 @@ def disponibles_view(request):
 @empleado_o_admin
 def detalle_equipo(request, pk):
     """
-    Muestra el detalle completo de un equipo activo del inventario.
+    @brief Muestra el detalle completo de un equipo activo del inventario.
 
     Incluye las rentas activas asociadas al equipo para que el usuario
     pueda conocer su estado actual, según lo definido en RF-08 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
-        pk (int): Identificador único del equipo a consultar.
+    @param request HttpRequest Solicitud HTTP.
+    @param pk int Identificador único del equipo a consultar.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla inventario/detalle.html con
-        los datos del equipo y sus rentas activas, o devuelve 404 si no existe.
+    @return HttpResponse Renderiza la plantilla inventario/detalle.html con
+    los datos del equipo y sus rentas activas, o devuelve 404 si no existe.
     """
     equipo = get_object_or_404(Equipo, pk=pk, activo=True)
     rentas_activas = equipo.rentas.filter(
@@ -122,19 +116,17 @@ def detalle_equipo(request, pk):
 @admin_required
 def crear_equipo(request):
     """
-    Gestiona el registro de un nuevo equipo en el inventario.
+    @brief Gestiona el registro de un nuevo equipo en el inventario.
 
     Solo accesible para el Administrador. Al guardar exitosamente,
     el equipo queda registrado con estado 'Disponible' y visible
     para todos los usuarios, según lo definido en RF-05 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. En método POST debe
-        contener los datos del formulario de creación de equipo.
+    @param request HttpRequest Solicitud HTTP. En método POST debe
+    contener los datos del formulario de creación de equipo.
 
-    Retorna:
-        HttpResponse: Redirige al listado de inventario si el registro
-        es exitoso, o renderiza el formulario con errores si falla.
+    @return HttpResponse Redirige al listado de inventario si el registro
+    es exitoso, o renderiza el formulario con errores si falla.
     """
     if request.method == 'POST':
         form = EquipoForm(request.POST, request.FILES)
@@ -154,20 +146,18 @@ def crear_equipo(request):
 @admin_required
 def editar_equipo(request, pk):
     """
-    Gestiona la edición de la información de un equipo existente.
+    @brief Gestiona la edición de la información de un equipo existente.
 
     Solo accesible para el Administrador. Aplica la restricción RN-007
     del SRS que impide reducir la cantidad total por debajo del número
     de unidades actualmente en renta activa.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. En método POST debe
-        contener los datos actualizados del formulario de edición.
-        pk (int): Identificador único del equipo a editar.
+    @param request HttpRequest Solicitud HTTP. En método POST debe
+    contener los datos actualizados del formulario de edición.
+    @param pk int Identificador único del equipo a editar.
 
-    Retorna:
-        HttpResponse: Redirige al detalle del equipo si la edición es exitosa,
-        o renderiza el formulario con errores si falla o viola RN-007.
+    @return HttpResponse Redirige al detalle del equipo si la edición es exitosa,
+    o renderiza el formulario con errores si falla o viola RN-007.
     """
     equipo = get_object_or_404(Equipo, pk=pk, activo=True)
     tiene_renta = equipo.tiene_renta_activa()
@@ -214,22 +204,20 @@ def editar_equipo(request, pk):
 @admin_required
 def dar_baja_equipo(request, pk):
     """
-    Gestiona la baja de un equipo del inventario.
+    @brief Gestiona la baja de un equipo del inventario.
 
     Solo accesible para el Administrador. Aplica la restricción RN-006
     del SRS que impide dar de baja un equipo con unidades actualmente
     en renta activa. La baja es lógica: el equipo se marca como inactivo
     pero no se elimina de la base de datos.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST
-        para confirmar y ejecutar la baja.
-        pk (int): Identificador único del equipo a dar de baja.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST
+    para confirmar y ejecutar la baja.
+    @param pk int Identificador único del equipo a dar de baja.
 
-    Retorna:
-        HttpResponse: Redirige al listado de inventario si la baja es exitosa,
-        redirige al detalle con mensaje de error si el equipo tiene rentas activas,
-        o renderiza la plantilla de confirmación si la solicitud es GET.
+    @return HttpResponse Redirige al listado de inventario si la baja es exitosa,
+    redirige al detalle con mensaje de error si el equipo tiene rentas activas,
+    o renderiza la plantilla de confirmación si la solicitud es GET.
     """
     equipo = get_object_or_404(Equipo, pk=pk, activo=True)
 
@@ -262,22 +250,20 @@ def dar_baja_equipo(request, pk):
 @empleado_o_admin
 def solicitar_cambio(request):
     """
-    Gestiona el envío de solicitudes de cambio en el inventario por parte del Empleado.
+    @brief Gestiona el envío de solicitudes de cambio en el inventario por parte del Empleado.
 
     Permite al Empleado solicitar el alta, edición o baja de un equipo.
     La solicitud queda pendiente hasta que el Administrador la apruebe
     o rechace desde el panel de solicitudes, cumpliendo con RN-008 del SRS.
     Si el usuario es Administrador, lo redirige a realizar el cambio directamente.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Puede incluir el parámetro
-        GET 'equipo' para preseleccionar un equipo en el formulario. En método
-        POST debe contener los datos de la solicitud.
+    @param request HttpRequest Solicitud HTTP. Puede incluir el parámetro
+    GET 'equipo' para preseleccionar un equipo en el formulario. En método
+    POST debe contener los datos de la solicitud.
 
-    Retorna:
-        HttpResponse: Redirige al listado de inventario si la solicitud se envía
-        exitosamente o si el usuario es Administrador, o renderiza el formulario
-        de solicitud con los datos del equipo preseleccionado si falla.
+    @return HttpResponse Redirige al listado de inventario si la solicitud se envía
+    exitosamente o si el usuario es Administrador, o renderiza el formulario
+    de solicitud con los datos del equipo preseleccionado si falla.
     """
     import json
     from django.core.serializers.json import DjangoJSONEncoder

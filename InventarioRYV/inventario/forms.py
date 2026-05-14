@@ -14,9 +14,9 @@ from .models import Equipo
 
 class EquipoForm(forms.ModelForm):
     """
-    Formulario para crear o editar un equipo del inventario.
+    @brief Formulario para crear o editar un equipo del inventario.
 
-    Valida que las unidades en mantenimiento no sean iguales o mayores
+    @details Valida que las unidades en mantenimiento no sean iguales o mayores
     a la cantidad total registrada, según lo definido en RF-05 y RF-09 del SRS.
     """
 
@@ -64,14 +64,12 @@ class EquipoForm(forms.ModelForm):
 
     def clean(self):
         """
-        Valida que las unidades en mantenimiento no superen la cantidad total.
+        @brief Valida que las unidades en mantenimiento no superen la cantidad total.
 
-        Lanza:
-            ValidationError: Si cantidad_en_mantenimiento es igual o mayor
-            a cantidad_total.
+        @return dict Los datos limpios del formulario si la validación es exitosa.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @raise ValidationError Si cantidad_en_mantenimiento es igual o mayor
+        a cantidad_total.
         """
         cleaned = super().clean()
         total = cleaned.get('cantidad_total')
@@ -87,20 +85,11 @@ class EquipoForm(forms.ModelForm):
 
 class SolicitudEquipoForm(forms.Form):
     """
-    Formulario para que el Empleado solicite cambios en el inventario.
+    @brief Formulario para que el Empleado solicite cambios en el inventario.
 
-    Permite solicitar el alta de un nuevo equipo, la edición de uno existente
+    @details Permite solicitar el alta de un nuevo equipo, la edición de uno existente
     o su baja. Los campos requeridos se validan dinámicamente según el tipo
     de solicitud seleccionado, cumpliendo con RN-008 del SRS.
-
-    Atributos:
-        tipo (ChoiceField): Tipo de solicitud: alta, edición o baja de equipo.
-        equipo_existente (ModelChoiceField): Equipo a modificar o dar de baja.
-        nombre_equipo (CharField): Nombre del equipo para solicitudes de alta.
-        descripcion_equipo (CharField): Descripción del equipo para alta o edición.
-        cantidad_total (IntegerField): Cantidad de unidades para alta o edición.
-        cantidad_baja (IntegerField): Unidades a retirar en solicitudes de baja.
-        comentario (CharField): Motivo u observaciones de la solicitud. Siempre requerido.
     """
 
     TIPO_CHOICES = [
@@ -115,7 +104,6 @@ class SolicitudEquipoForm(forms.Form):
         widget=forms.Select(attrs={'class': 'input-campo', 'id': 'id_tipo_solicitud'}),
     )
 
-    # ── Equipo existente (para edición y baja) ──
     equipo_existente = forms.ModelChoiceField(
         queryset=Equipo.objects.none(),
         required=False,
@@ -124,7 +112,6 @@ class SolicitudEquipoForm(forms.Form):
         widget=forms.Select(attrs={'class': 'input-campo', 'id': 'id_equipo_existente'}),
     )
 
-    # ── Campos para alta de equipo ──
     nombre_equipo = forms.CharField(
         label='Nombre del equipo',
         required=False,
@@ -144,7 +131,6 @@ class SolicitudEquipoForm(forms.Form):
         widget=forms.NumberInput(attrs={'class': 'input-campo', 'min': 1}),
     )
 
-    # ── Cantidad a dar de baja ──
     cantidad_baja = forms.IntegerField(
         label='Cantidad de unidades a dar de baja',
         required=False,
@@ -153,7 +139,6 @@ class SolicitudEquipoForm(forms.Form):
         help_text='Número de unidades que deseas retirar del inventario.',
     )
 
-    # ── Comentario / motivo (siempre requerido) ──
     comentario = forms.CharField(
         label='Motivo / observaciones',
         widget=forms.Textarea(
@@ -164,12 +149,11 @@ class SolicitudEquipoForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         """
-        Inicializa el formulario cargando los equipos activos disponibles
+        @brief Inicializa el formulario cargando los equipos activos disponibles
         para selección en los campos de edición y baja.
 
-        Parámetros:
-            *args: Argumentos posicionales del formulario.
-            **kwargs: Argumentos de palabras clave del formulario.
+        @param args tuple Argumentos posicionales del formulario.
+        @param kwargs dict Argumentos de palabras clave del formulario.
         """
         super().__init__(*args, **kwargs)
         self.fields['equipo_existente'].queryset = Equipo.objects.filter(
@@ -178,18 +162,16 @@ class SolicitudEquipoForm(forms.Form):
 
     def clean(self):
         """
-        Valida los campos requeridos según el tipo de solicitud seleccionado.
+        @brief Valida los campos requeridos según el tipo de solicitud seleccionado.
 
-        Para alta de equipo valida que se ingrese nombre y cantidad. Para
+        @details Para alta de equipo valida que se ingrese nombre y cantidad. Para
         edición y baja valida que se seleccione un equipo existente. Para
         baja además valida que se indique la cantidad de unidades a retirar.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @return dict Los datos limpios del formulario si la validación es exitosa.
 
-        Lanza:
-            ValidationError: Por campo específico si algún dato requerido
-            según el tipo de solicitud está ausente o es inválido.
+        @raise ValidationError Por campo específico si algún dato requerido
+        según el tipo de solicitud está ausente o es inválido.
         """
         cleaned = super().clean()
         tipo = cleaned.get('tipo')

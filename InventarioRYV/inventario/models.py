@@ -12,13 +12,14 @@ from django.db import models
 
 class Equipo(models.Model):
     """
-    Representa una herramienta o maquinaria disponible para renta.
+    @class Equipo
+    @brief Representa una herramienta o maquinaria disponible para renta.
 
     Gestiona la disponibilidad mediante cantidades granulares que permiten
     controlar cuántas unidades están disponibles, rentadas o en mantenimiento
     en tiempo real, según lo definido en RF-05 y RN-001 del SRS.
 
-    Atributos:
+    @attributes
         nombre (str): Nombre descriptivo del equipo.
         descripcion (str): Descripción detallada del equipo. Campo opcional.
         cantidad_total (int): Total de unidades registradas del equipo.
@@ -71,23 +72,21 @@ class Equipo(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto del equipo.
+        @brief Retorna la representación en texto del equipo.
 
-        Retorna:
-            str: Nombre del equipo.
+        @return str Nombre del equipo.
         """
         return self.nombre
 
     @property
     def cantidad_disponible(self):
         """
-        Calcula las unidades disponibles para renta en tiempo real.
+        @brief Calcula las unidades disponibles para renta en tiempo real.
 
         Resta las unidades en renta y en mantenimiento del total registrado.
         El resultado nunca es menor a cero.
 
-        Retorna:
-            int: Número de unidades disponibles para nueva renta.
+        @return int Número de unidades disponibles para nueva renta.
         """
         return max(
             0,
@@ -99,15 +98,10 @@ class Equipo(models.Model):
     @property
     def estado(self):
         """
-        Determina el estado del equipo para su visualización en el sistema.
+        @brief Determina el estado del equipo para su visualización en el sistema.
 
-        El estado se deriva de las cantidades registradas y puede ser
-        uno de los siguientes valores: disponible, parcial, rentado
-        o mantenimiento.
-
-        Retorna:
-            str: Estado del equipo. Valores posibles: 'disponible',
-            'parcial', 'rentado' o 'mantenimiento'.
+        @return str Estado del equipo. Valores posibles: 'disponible',
+        'parcial', 'rentado' o 'mantenimiento'.
         """
         disp = self.cantidad_disponible
         if disp == self.cantidad_total:
@@ -120,12 +114,10 @@ class Equipo(models.Model):
 
     def get_estado_display(self):
         """
-        Retorna el texto legible del estado del equipo para mostrar en plantillas.
+        @brief Retorna el texto legible del estado del equipo para mostrar en plantillas.
 
-        Retorna:
-            str: Texto descriptivo del estado. Valores posibles:
-            'Disponible', 'Parcialmente disponible',
-            'Todo rentado' o 'En mantenimiento'.
+        @return str Texto descriptivo del estado. Valores posibles:
+        'Disponible', 'Parcialmente disponible', 'Todo rentado' o 'En mantenimiento'.
         """
         mapa = {
             'disponible': 'Disponible',
@@ -137,21 +129,18 @@ class Equipo(models.Model):
 
     def tiene_renta_activa(self):
         """
-        Verifica si el equipo tiene al menos una unidad actualmente rentada.
+        @brief Verifica si el equipo tiene al menos una unidad actualmente rentada.
 
-        Retorna:
-            bool: True si cantidad_en_renta es mayor a cero, False en caso contrario.
+        @return bool True si cantidad_en_renta es mayor a cero, False en caso contrario.
         """
         return self.cantidad_en_renta > 0
 
     def tiene_disponibles(self, cantidad=1):
         """
-        Verifica si el equipo tiene suficientes unidades disponibles para renta.
+        @brief Verifica si el equipo tiene suficientes unidades disponibles para renta.
 
-        Parámetros:
-            cantidad (int): Número de unidades requeridas. Por defecto es 1.
+        @param cantidad int Número de unidades requeridas. Por defecto es 1.
 
-        Retorna:
-            bool: True si hay suficientes unidades disponibles, False en caso contrario.
+        @return bool True si hay suficientes unidades disponibles, False en caso contrario.
         """
         return self.cantidad_disponible >= cantidad
