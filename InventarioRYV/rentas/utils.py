@@ -11,14 +11,13 @@ from datetime import date
 
 def marcar_rentas_vencidas():
     """
-    Marca como 'vencidas' todas las rentas activas cuya fecha de vencimiento ya pasó.
+    @brief Marca como 'vencidas' las rentas activas expiradas.
 
-    Ejecuta una actualización masiva en la base de datos para cambiar el estado
-    de las rentas activas expiradas, sin cargarlas individualmente en memoria.
-    Útil para ejecutarse periódicamente como tarea programada.
+    @details Realiza una actualización masiva en la base de datos para evitar
+    cargar cada instancia en memoria; pensado para ejecutarse desde tareas
+    programadas (cron / Celery beat) y mantener consistente el estado de las rentas.
 
-    Retorna:
-        int: Número de rentas actualizadas a estado 'vencida'.
+    @return int Número de registros actualizados a estado 'vencida'.
     """
     from .models import Renta
     vencidas = Renta.objects.filter(

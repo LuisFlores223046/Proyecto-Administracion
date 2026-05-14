@@ -13,13 +13,16 @@ from django.db import models
 
 class Cliente(models.Model):
     """
-    Representa un cliente que renta equipo o maquinaria de RYV Rentas.
+    @class Cliente
+    @brief Representa un cliente que renta equipo o maquinaria de RYV Rentas.
 
     Solo almacena datos de contacto básicos. No se guardan datos financieros
     sensibles como números de tarjeta o cuentas bancarias, cumpliendo con
     RN-010 y RNF-006 del SRS.
 
-    Atributos:
+    @note Atributos listados a continuación describen campos del modelo.
+
+    @attributes
         nombre (str): Nombre completo del cliente. Campo obligatorio.
         telefono (str): Número de teléfono de contacto. Campo obligatorio.
         direccion (str): Dirección del cliente. Campo opcional.
@@ -61,24 +64,24 @@ class Cliente(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto del cliente.
+        @brief Retorna la representación en texto del cliente.
 
-        Retorna:
-            str: Nombre completo del cliente.
+        @return str Nombre completo del cliente.
         """
         return self.nombre
 
 
 class Renta(models.Model):
     """
-    Representa el ciclo de vida completo de una renta de equipo o maquinaria.
+    @class Renta
+    @brief Representa el ciclo de vida completo de una renta de equipo o maquinaria.
 
     Gestiona el flujo desde la creación de la renta (estado activa) hasta
     su cierre (finalizada o vencida), incluyendo el control de pagos,
     depósitos, condición de devolución y alertas de vencimiento,
     según lo definido en RF-13 al RF-19 y RN-001 al RN-004 del SRS.
 
-    Atributos:
+    @note Atributos del modelo:
         equipo (Equipo): Equipo principal asociado a la renta.
         cliente (Cliente): Cliente que realiza la renta.
         registrada_por (Usuario): Usuario que registró la renta en el sistema.
@@ -228,34 +231,31 @@ class Renta(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto de la renta.
+        @brief Retorna la representación en texto del la renta.
 
-        Retorna:
-            str: Cadena con el equipo, cliente y estado actual de la renta.
+        @return str Cadena con el equipo, cliente y estado actual de la renta.
         """
         return f"{self.equipo} - {self.cliente} ({self.estado})"
 
     @property
     def saldo_pendiente(self):
         """
-        Calcula el saldo que el cliente aún debe pagar al devolver el equipo.
+        @brief Calcula el saldo que el cliente aún debe pagar al devolver el equipo.
 
         Resta el depósito entregado al precio total de la renta.
         El resultado nunca es menor a cero.
 
-        Retorna:
-            Decimal: Monto pendiente de pago en MXN.
+        @return Decimal Monto pendiente de pago en MXN.
         """
         return max(self.precio - self.deposito, 0)
 
     @property
     def sobrante_deposito(self):
         """
-        Calcula el sobrante del depósito si fue mayor al precio total.
+        @brief Calcula el sobrante del depósito si fue mayor al precio total.
 
-        Retorna:
-            Decimal: Monto sobrante en MXN si el depósito supera el precio,
-            o None si el depósito es menor o igual al precio.
+        @return Decimal|None Monto sobrante en MXN si el depósito supera el precio,
+        o None si el depósito es menor o igual al precio.
         """
         if self.deposito > self.precio:
             return self.deposito - self.precio
@@ -264,15 +264,14 @@ class Renta(models.Model):
     @property
     def cambio_a_devolver(self):
         """
-        Calcula el cambio que se le regresa al cliente al cerrar la renta.
+        @brief Calcula el cambio que se le regresa al cliente al cerrar la renta.
 
         Solo disponible cuando monto_recibido está registrado. Un valor
         positivo indica cambio a devolver al cliente; un valor negativo
         indica que el cliente aún tiene saldo pendiente.
 
-        Retorna:
-            Decimal: Diferencia entre monto recibido y saldo pendiente en MXN,
-            o None si monto_recibido no ha sido registrado.
+        @return Decimal|None Diferencia entre monto recibido y saldo pendiente en MXN,
+        o None si monto_recibido no ha sido registrado.
         """
         if self.monto_recibido is None:
             return None
@@ -281,14 +280,10 @@ class Renta(models.Model):
     @property
     def dias_para_vencer(self):
         """
-        Calcula los días restantes hasta el vencimiento de la renta.
+        @brief Calcula los días restantes hasta el vencimiento de la renta.
 
-        Un valor negativo indica que la renta ya venció. Solo aplica
-        para rentas con estado activa, cumpliendo con RN-004 del SRS.
-
-        Retorna:
-            int: Días restantes hasta la fecha de vencimiento,
-            o None si la renta no está activa.
+        @return int|None Días restantes hasta la fecha de vencimiento,
+        o None si la renta no está activa.
         """
         from datetime import date
         if self.estado == 'activa':
@@ -298,13 +293,9 @@ class Renta(models.Model):
     @property
     def esta_por_vencer(self):
         """
-        Verifica si la renta vence en 3 días o menos pero aún no ha vencido.
+        @brief Verifica si la renta vence en 3 días o menos pero aún no ha vencido.
 
-        Activa las alertas visuales en el dashboard según RN-004 del SRS,
-        que establece el umbral de alerta en 3 días antes del vencimiento.
-
-        Retorna:
-            bool: True si la renta vence en 3 días o menos, False en caso contrario.
+        @return bool True si la renta vence en 3 días o menos, False en caso contrario.
         """
         dias = self.dias_para_vencer
         return dias is not None and 0 <= dias <= 3
@@ -312,13 +303,9 @@ class Renta(models.Model):
     @property
     def esta_vencida_sin_cerrar(self):
         """
-        Verifica si la renta ya venció pero sigue registrada como activa.
+        @brief Verifica si la renta ya venció pero sigue registrada como activa.
 
-        Identifica rentas que requieren atención inmediata por haber superado
-        su fecha de vencimiento sin ser finalizadas.
-
-        Retorna:
-            bool: True si la renta venció y aún está activa, False en caso contrario.
+        @return bool True si la renta venció y aún está activa, False en caso contrario.
         """
         dias = self.dias_para_vencer
         return dias is not None and dias < 0
@@ -326,14 +313,10 @@ class Renta(models.Model):
     @property
     def nombre_equipo_display(self):
         """
-        Retorna el nombre del equipo formateado para vistas de lista.
+        @brief Retorna el nombre del equipo formateado para vistas de lista.
 
-        Si la renta tiene múltiples equipos asociados mediante items,
-        muestra el nombre del primero seguido de la cantidad adicional.
-
-        Retorna:
-            str: Nombre del equipo principal, con indicador de equipos
-            adicionales si aplica, o '—' si no hay equipo asociado.
+        @return str Nombre del equipo principal, con indicador de equipos
+        adicionales si aplica, o '—' si no hay equipo asociado.
         """
         items = list(self.items.select_related('equipo').all())
         if items:
@@ -345,13 +328,9 @@ class Renta(models.Model):
     @property
     def cantidad_total_equipos(self):
         """
-        Calcula la cantidad total de unidades rentadas en todos los items.
+        @brief Calcula la cantidad total de unidades rentadas en todos los items.
 
-        Si la renta tiene items asociados, suma sus cantidades. En caso
-        contrario retorna la cantidad del equipo principal.
-
-        Retorna:
-            int: Total de unidades rentadas en la renta.
+        @return int Total de unidades rentadas en la renta.
         """
         items = list(self.items.all())
         if items:
@@ -361,12 +340,13 @@ class Renta(models.Model):
 
 class RentaEquipo(models.Model):
     """
-    Representa un equipo incluido dentro de una renta.
+    @class RentaEquipo
+    @brief Representa un equipo incluido dentro de una renta.
 
     Permite asociar múltiples herramientas o equipos a una misma renta,
     indicando la cantidad de unidades rentadas por cada uno.
 
-    Atributos:
+    @attributes
         renta (Renta): Renta a la que pertenece este item.
         equipo (Equipo): Equipo asociado al item de la renta.
         cantidad (int): Número de unidades rentadas de este equipo.
@@ -395,9 +375,8 @@ class RentaEquipo(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto del item de renta.
+        @brief Retorna la representación en texto del item de renta.
 
-        Retorna:
-            str: Cadena con la cantidad y nombre del equipo rentado.
+        @return str Cadena con la cantidad y nombre del equipo rentado.
         """
         return f'{self.cantidad}x {self.equipo.nombre}'

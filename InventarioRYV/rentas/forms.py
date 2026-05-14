@@ -24,14 +24,13 @@ _telefono_validator = RegexValidator(
 
 def equipos_con_disponibles():
     """
-    Retorna un QuerySet de equipos activos con al menos una unidad disponible.
+    @brief Retorna un QuerySet de equipos activos con al menos una unidad disponible.
 
-    Calcula la disponibilidad directamente en la base de datos mediante
-    anotación ORM para evitar cargar todos los equipos en memoria.
+    @details Calcula la disponibilidad directamente en la base de datos mediante
+    una anotación ORM para evitar cargar todos los equipos en memoria.
 
-    Retorna:
-        QuerySet: Equipos activos con campo anotado calc_disp mayor a cero,
-        ordenados según la configuración del modelo.
+    @return QuerySet Equipos activos con campo anotado `calc_disp` mayor a cero,
+    filtrados y ordenados según la configuración del modelo.
     """
     return Equipo.objects.filter(activo=True).annotate(
         calc_disp=ExpressionWrapper(
@@ -45,13 +44,14 @@ def equipos_con_disponibles():
 
 class RentaForm(forms.ModelForm):
     """
-    Formulario para que el Administrador registre una nueva renta.
+    @class RentaForm
+    @brief Formulario para que el Administrador registre una nueva renta.
 
-    Incluye campos del cliente y de la renta. Los equipos se agregan como
+    @details Incluye campos del cliente y de la renta. Los equipos se agregan como
     filas dinámicas desde la plantilla y se procesan en la vista,
     según lo definido en RF-13 y RN-005 del SRS.
 
-    Atributos:
+    @attributes
         cliente_nombre (CharField): Nombre completo del cliente. Obligatorio.
         cliente_telefono (CharField): Teléfono de contacto del cliente. Obligatorio.
         cliente_direccion (CharField): Dirección del cliente. Campo opcional.
@@ -130,18 +130,15 @@ class RentaForm(forms.ModelForm):
 
     def clean(self):
         """
-        Valida que las fechas sean coherentes y que el depósito sea un monto válido.
+        @brief Valida coherencia de fechas y validez del depósito para una renta.
 
-        La fecha de vencimiento debe ser posterior a la fecha de inicio.
-        El depósito se maneja como una cantidad monetaria. Si se ingresa un
-        depósito mayor a cero, el método de pago es obligatorio.
+        @details Verifica que `fecha_vencimiento` sea posterior a `fecha_inicio`.
+        El `deposito` se trata como una cantidad monetaria; si su valor es
+        mayor a cero entonces `metodo_pago` debe estar presente.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @return dict Datos limpios del formulario.
 
-        Lanza:
-            ValidationError: Si la fecha de vencimiento no es posterior a la
-            fecha de inicio, o si el depósito es menor al mínimo requerido.
+        @raise forms.ValidationError Si `fecha_vencimiento` no es posterior a `fecha_inicio`.
         """
         cleaned = super().clean()
         fecha_inicio = cleaned.get('fecha_inicio')
@@ -168,13 +165,14 @@ class RentaForm(forms.ModelForm):
 
 class SolicitudRentaForm(forms.Form):
     """
-    Formulario para que el Empleado solicite una nueva renta.
+    @class SolicitudRentaForm
+    @brief Formulario para que el Empleado solicite una nueva renta.
 
-    Los equipos se agregan como filas dinámicas desde la plantilla y se
+    @details Los equipos se agregan como filas dinámicas desde la plantilla y se
     procesan en la vista. La solicitud queda pendiente de aprobación por
     el Administrador, cumpliendo con RF-14 y RN-008 del SRS.
 
-    Atributos:
+    @attributes
         cliente_nombre (CharField): Nombre completo del cliente. Obligatorio.
         cliente_telefono (CharField): Teléfono de contacto del cliente. Obligatorio.
         cliente_direccion (CharField): Dirección del cliente. Campo opcional.
@@ -274,18 +272,15 @@ class SolicitudRentaForm(forms.Form):
 
     def clean(self):
         """
-        Valida que las fechas sean coherentes y que el depósito sea un monto válido.
+        @brief Valida coherencia de fechas y validez del depósito para una solicitud.
 
-        La fecha de vencimiento debe ser posterior a la fecha de inicio.
-        El depósito se maneja como una cantidad monetaria. Si se ingresa un
-        depósito mayor a cero, el método de pago es obligatorio.
+        @details Comprueba que `fecha_vencimiento` sea posterior a `fecha_inicio`.
+        El `deposito` se trata como cantidad monetaria; si es mayor a cero,
+        `metodo_pago` es obligatorio y se agrega un error de campo si falta.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @return dict Datos limpios del formulario.
 
-        Lanza:
-            ValidationError: Si la fecha de vencimiento no es posterior a la
-            fecha de inicio.
+        @raise forms.ValidationError Si `fecha_vencimiento` no es posterior a `fecha_inicio`.
         """
         cleaned = super().clean()
         inicio = cleaned.get('fecha_inicio')
@@ -311,9 +306,10 @@ class SolicitudRentaForm(forms.Form):
 
 class RentaEditForm(forms.ModelForm):
     """
-    Formulario para editar datos básicos de una renta activa (admin).
+    @class RentaEditForm
+    @brief Formulario para editar datos básicos de una renta activa (admin).
 
-    Sobreescribe los campos de fecha para garantizar que el formato YYYY-MM-DD
+    @details Sobreescribe los campos de fecha para garantizar que el formato YYYY-MM-DD
     enviado por los inputs HTML de tipo date sea interpretado correctamente,
     independientemente de la configuración regional del servidor.
     """
@@ -354,6 +350,14 @@ class RentaEditForm(forms.ModelForm):
         }
 
     def clean(self):
+        """
+        @brief Valida que la fecha de vencimiento sea posterior a la fecha de inicio
+        cuando se edita una renta.
+
+        @return dict Datos limpios del formulario.
+
+        @raise forms.ValidationError Si `fecha_vencimiento` no es posterior a `fecha_inicio`.
+        """
         cleaned = super().clean()
         inicio = cleaned.get('fecha_inicio')
         vencimiento = cleaned.get('fecha_vencimiento')
@@ -364,13 +368,14 @@ class RentaEditForm(forms.ModelForm):
 
 class FinalizarRentaForm(forms.Form):
     """
-    Formulario para que el Administrador registre la devolución de un equipo.
+    @class FinalizarRentaForm
+    @brief Formulario para que el Administrador registre la devolución de un equipo.
 
-    Captura la condición del equipo devuelto, el cargo por daños si aplica,
+    @details Captura la condición del equipo devuelto, el cargo por daños si aplica,
     el monto recibido del cliente y el método de pago al cierre, según lo
     definido en RF-17 del SRS.
 
-    Atributos:
+    @attributes
         condicion_devolucion (ChoiceField): Estado del equipo al momento de
         la devolución. Obligatorio.
         cargo_daños (DecimalField): Monto adicional por daños en MXN.
@@ -437,14 +442,14 @@ class FinalizarRentaForm(forms.Form):
 
     def clean(self):
         """
-        Valida que se ingrese el cargo por daños cuando la condición no es 'bueno'.
+        @brief Valida la presencia del cargo por daños cuando aplica.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @details Si `condicion_devolucion` es distinta de 'bueno', entonces
+        `cargo_daños` se considera obligatorio y se añade un error de campo si falta.
 
-        Lanza:
-            ValidationError: Por campo específico si la condición de devolución
-            indica daños pero no se ingresó el cargo correspondiente.
+        @return dict Datos limpios del formulario.
+
+        @raise forms.ValidationError Por campo si falta `cargo_daños` cuando corresponde.
         """
         cleaned = super().clean()
         condicion = cleaned.get('condicion_devolucion')
