@@ -13,13 +13,14 @@ from django.db import models
 
 class Usuario(AbstractUser):
     """
-    Usuario personalizado que extiende AbstractUser de Django.
+    @class Usuario
+    @brief Usuario personalizado que extiende AbstractUser de Django.
 
     Agrega el campo rol para diferenciar permisos entre Administrador
     y Empleado dentro del sistema, siguiendo las reglas de acceso
     definidas en RF-03 y RN-008 del SRS.
 
-    Atributos:
+    @attributes
         rol (str): Rol asignado al usuario. Puede ser 'administrador'
         o 'empleado'. Por defecto es 'empleado'.
     """
@@ -41,18 +42,16 @@ class Usuario(AbstractUser):
 
     def es_administrador(self):
         """
-        Verifica si el usuario tiene rol de Administrador.
+        @brief Verifica si el usuario tiene rol de Administrador.
 
-        Returns:
-            bool: True si el rol del usuario es 'administrador', False en caso contrario.
+        @return bool True si el rol del usuario es 'administrador', False en caso contrario.
         """
         return self.rol == 'administrador'
 
     def es_empleado(self):
         """
-        Verifica si el usuario tiene rol de Empleado.
+        @brief Verifica si el usuario tiene rol de Empleado.
 
-        Returns:
-            bool: True si el rol del usuario es 'empleado', False en caso contrario.
+        @return bool True si el rol del usuario es 'empleado', False en caso contrario.
         """
         return self.rol == 'empleado'
