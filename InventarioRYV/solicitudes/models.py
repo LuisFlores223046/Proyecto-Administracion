@@ -13,14 +13,15 @@ from django.db import models
 
 class Solicitud(models.Model):
     """
-    Representa una solicitud de cambio enviada por el Empleado al Administrador.
+    @class Solicitud
+    @brief Representa una solicitud de cambio enviada por el Empleado al Administrador.
 
     Gestiona el flujo de aprobación para operaciones de alta, edición y baja
     de equipos, así como el registro y cierre de rentas. El Administrador
     aprueba o rechaza cada solicitud desde el panel de administración,
     cumpliendo con RN-008 del SRS.
 
-    Atributos:
+    @attributes
         tipo (str): Tipo de operación solicitada. Puede ser alta_equipo,
         edicion_equipo, baja_equipo, nueva_renta o cierre_renta.
         estado (str): Estado actual de la solicitud: pendiente, aprobada
@@ -28,7 +29,6 @@ class Solicitud(models.Model):
         solicitante (Usuario): Empleado que envió la solicitud.
         equipo (Equipo): Equipo involucrado en la solicitud. Campo opcional.
         renta (Renta): Renta involucrada en la solicitud. Campo opcional.
-        Solo aplica para solicitudes de tipo nueva_renta y cierre_renta.
         comentario (str): Motivo u observaciones del Empleado. Obligatorio.
         datos_json (dict): Datos adicionales de la solicitud serializados
         en formato JSON. Campo opcional.
@@ -114,11 +114,9 @@ class Solicitud(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto de la solicitud.
+        @brief Retorna la representación en texto de la solicitud.
 
-        Retorna:
-            str: Cadena con el tipo de solicitud, el solicitante
-            y el estado actual.
+        @return str Cadena con el tipo de solicitud, el solicitante y el estado actual.
         """
         return (
             f"{self.get_tipo_display()} - "

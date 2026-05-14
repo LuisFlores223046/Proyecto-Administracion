@@ -13,32 +13,20 @@ from django.utils import timezone
 
 def ejecutar_solicitud(solicitud):
     """
-    Ejecuta la acción correspondiente al aprobar una solicitud del Empleado.
+    @brief Ejecuta la acción correspondiente al aprobar una solicitud.
 
-    Procesa el tipo de solicitud y aplica los cambios en inventario o rentas
-    de forma automática al ser aprobada por el Administrador, cumpliendo con
-    RN-008 del SRS. Soporta los siguientes tipos de solicitud:
+    @details Interpreta `solicitud.tipo` y aplica cambios en inventario o
+    rentas según el tipo: `alta_equipo`, `edicion_equipo`, `baja_equipo`,
+    `nueva_renta` y `cierre_renta`. Se espera que la `solicitud` tenga estado
+    'pendiente' y que, cuando aplique, `datos_json` contenga la información
+    necesaria para realizar la operación.
 
-    - alta_equipo: crea un nuevo Equipo en el inventario.
-    - edicion_equipo: actualiza los campos permitidos de un Equipo existente.
-    - baja_equipo: desactiva el Equipo si no tiene rentas activas, o reduce
-      su cantidad total si la baja es parcial.
-    - nueva_renta: crea una nueva Renta con uno o más equipos y actualiza
-      los contadores de unidades en renta, cumpliendo con RN-002.
-    - cierre_renta: finaliza la Renta y libera las unidades del equipo,
-      cumpliendo con RN-003.
+    @param solicitud Solicitud Instancia de la solicitud a ejecutar.
 
-    Parámetros:
-        solicitud (Solicitud): Instancia de la solicitud a ejecutar.
-        Debe tener estado 'pendiente' y contener los datos necesarios
-        en datos_json para el tipo de operación correspondiente.
+    @return None
 
-    Retorna:
-        None
-
-    Lanza:
-        ValueError: Si el equipo tiene rentas activas al intentar una baja,
-        o si no hay suficientes unidades disponibles al aprobar una nueva renta.
+    @raise ValueError Si la operación no puede completarse (p. ej. baja con rentas activas
+    o insuficiencia de unidades para una nueva renta).
     """
     from inventario.models import Equipo
     from rentas.models import Renta, Cliente, RentaEquipo
