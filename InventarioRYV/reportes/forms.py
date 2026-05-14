@@ -12,15 +12,11 @@ from django import forms
 
 class ReporteRentasForm(forms.Form):
     """
-    Formulario para seleccionar el periodo de un reporte de rentas.
+    @brief Formulario para seleccionar el periodo de un reporte de rentas.
 
-    Permite al Administrador definir el rango de fechas para generar
+    @details Permite al Administrador definir el rango de fechas para generar
     el reporte de rentas por periodo, cumpliendo con RF-22 y RN-012 del SRS
     que requieren precio e ingreso total del periodo seleccionado.
-
-    Atributos:
-        periodo_inicio (DateField): Fecha de inicio del periodo a reportar.
-        periodo_fin (DateField): Fecha de fin del periodo a reportar.
     """
 
     periodo_inicio = forms.DateField(
@@ -40,13 +36,11 @@ class ReporteRentasForm(forms.Form):
 
     def clean(self):
         """
-        Valida que la fecha de inicio sea anterior o igual a la fecha de fin.
+        @brief Valida que la fecha de inicio sea anterior o igual a la fecha de fin.
 
-        Retorna:
-            dict: Los datos limpios del formulario si la validación es exitosa.
+        @return dict Los datos limpios del formulario si la validación es exitosa.
 
-        Lanza:
-            ValidationError: Si la fecha de fin es anterior a la fecha de inicio.
+        @raise ValidationError Si la fecha de fin es anterior a la fecha de inicio.
         """
         cleaned = super().clean()
         inicio = cleaned.get('periodo_inicio')

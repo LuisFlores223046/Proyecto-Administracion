@@ -51,7 +51,15 @@ CONDICIONES = {
 
 
 def _estilos():
-    """Retorna el conjunto de estilos con variantes personalizadas."""
+    """
+    @brief Construye y retorna los estilos tipográficos reutilizables para los PDFs.
+
+    @details Parte de la hoja base de ReportLab y agrega variantes personalizadas
+    para títulos de sección, etiquetas, valores y alineaciones usadas en
+    inventario, rentas por periodo y comprobantes.
+
+    @return StyleSheet1 Conjunto de estilos listo para usar en la construcción de reportes.
+    """
     s = getSampleStyleSheet()
     s.add(ParagraphStyle(
         name='Centrado',
@@ -95,17 +103,14 @@ def _estilos():
 # ─────────────────────────────────────────────────────────────────────────────
 def generar_pdf_inventario(equipos_qs):
     """
-    Genera el reporte PDF con el estado actual del inventario de equipos.
+    @brief Genera un PDF con el estado actual del inventario.
 
-    Construye una tabla con el nombre, cantidad total, unidades en renta,
-    en mantenimiento y disponibles de cada equipo activo registrado en el
-    sistema, según lo definido en RF-21 y CU-23 del SRS.
+    @details Construye una tabla con nombre, total, en renta, en mantenimiento
+    y disponibles por equipo. El PDF se crea en memoria y se devuelve como
+    un objeto `bytes` listo para enviarse como respuesta HTTP o almacenarse.
 
-    Parámetros:
-        equipos_qs (QuerySet): QuerySet de instancias de Equipo activos.
-
-    Retorna:
-        bytes: Contenido del archivo PDF generado en memoria.
+    @param equipos_qs QuerySet QuerySet de instancias de `Equipo` activos.
+    @return bytes Contenido del archivo PDF generado en memoria.
     """
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter,
@@ -152,19 +157,16 @@ def generar_pdf_inventario(equipos_qs):
 # ─────────────────────────────────────────────────────────────────────────────
 def generar_pdf_rentas(rentas_qs, periodo_inicio=None, periodo_fin=None):
     """
-    Genera el reporte PDF de rentas dentro de un periodo seleccionado.
+    @brief Genera un PDF con las rentas dentro de un periodo.
 
-    Muestra el equipo principal (con indicador de equipos adicionales si los hay),
-    cliente, fechas, precio, depósito, monto recibido, cargo por daños y cambio.
-    Incluye fila de totales al final, cumpliendo con RF-22, RF-24 y RN-012 del SRS.
+    @details Lista rentas con datos financieros y de fechas, soporte para
+    rentas multi-equipo y fila de totales. Los parámetros de periodo son
+    opcionales; si se incluyen, se muestran en el encabezado.
 
-    Parámetros:
-        rentas_qs (QuerySet): QuerySet de instancias de Renta.
-        periodo_inicio (date): Fecha de inicio del periodo. Opcional.
-        periodo_fin (date): Fecha de fin del periodo. Opcional.
-
-    Retorna:
-        bytes: Contenido del archivo PDF generado en memoria.
+    @param rentas_qs QuerySet QuerySet de instancias de `Renta`.
+    @param periodo_inicio date Fecha de inicio del periodo (opcional).
+    @param periodo_fin date Fecha de fin del periodo (opcional).
+    @return bytes Contenido del archivo PDF generado en memoria.
     """
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter,
@@ -262,18 +264,14 @@ def generar_pdf_rentas(rentas_qs, periodo_inicio=None, periodo_fin=None):
 # ─────────────────────────────────────────────────────────────────────────────
 def generar_pdf_comprobante_renta(renta):
     """
-    Genera un comprobante PDF completo para una renta específica.
+    @brief Genera un comprobante PDF para una renta específica.
 
-    Incluye todos los datos del cliente, equipos rentados (con soporte para
-    rentas con múltiples equipos), fechas, resumen financiero, y —si la renta
-    está cerrada— el detalle de la devolución y condición del equipo.
+    @details El comprobante incluye cliente, equipos (soporte multi-equipo),
+    fechas y el resumen financiero. Si la renta está finalizada, se incluyen
+    detalles de devolución y condición del equipo.
 
-    Parámetros:
-        renta (Renta): Instancia de la renta a documentar. Debe tener
-        prefetch_related('items__equipo') aplicado previamente.
-
-    Retorna:
-        bytes: Contenido del archivo PDF generado en memoria.
+    @param renta Renta Instancia de `Renta` a documentar (prefetch recomendado).
+    @return bytes Contenido del archivo PDF generado en memoria.
     """
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(

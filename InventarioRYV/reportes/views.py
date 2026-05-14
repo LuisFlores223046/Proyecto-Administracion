@@ -27,18 +27,16 @@ from authentication.decorators import admin_required
 @admin_required
 def panel_reportes(request):
     """
-    Muestra el panel principal de generación de reportes.
+    @brief Muestra el panel principal de generación de reportes.
 
-    Presenta los formularios para generar reportes de inventario y de rentas
+    @details Presenta los formularios para generar reportes de inventario y de rentas
     por periodo, junto con los cinco reportes más recientes generados,
     según lo definido en RF-21, RF-22 y CU-22 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
+    @param request HttpRequest Solicitud HTTP.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla reportes/panel.html con el
-        formulario de rentas y los reportes recientes.
+    @return HttpResponse Renderiza la plantilla reportes/panel.html con el
+    formulario de rentas y los reportes recientes.
     """
     form_rentas = ReporteRentasForm()
     reportes_recientes = ReporteGenerado.objects.select_related(
@@ -55,18 +53,16 @@ def panel_reportes(request):
 @admin_required
 def generar_inventario(request):
     """
-    Genera y descarga el reporte PDF del estado actual del inventario.
+    @brief Genera y descarga el reporte PDF del estado actual del inventario.
 
-    Consulta todos los equipos activos, genera el PDF y registra el reporte
+    @details Consulta todos los equipos activos, genera el PDF y registra el reporte
     en el historial para su descarga posterior, según lo definido en RF-21
     y CU-23 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST.
 
-    Retorna:
-        HttpResponse: Descarga directa del archivo PDF si la generación
-        es exitosa, o redirige al panel de reportes con mensaje de error si falla.
+    @return HttpResponse Descarga directa del archivo PDF si la generación
+    es exitosa, o redirige al panel de reportes con mensaje de error si falla.
     """
     if request.method == 'POST':
         try:
@@ -100,19 +96,17 @@ def generar_inventario(request):
 @admin_required
 def generar_rentas(request):
     """
-    Genera y descarga el reporte PDF de rentas dentro de un periodo seleccionado.
+    @brief Genera y descarga el reporte PDF de rentas dentro de un periodo seleccionado.
 
-    Filtra las rentas por el rango de fechas indicado, genera el PDF con el
+    @details Filtra las rentas por el rango de fechas indicado, genera el PDF con el
     listado de rentas, precios e ingreso total del periodo, y registra el
     reporte en el historial, según lo definido en RF-22, RN-012 y CU-24 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST con
-        los campos periodo_inicio y periodo_fin del formulario de rentas.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST con
+    los campos periodo_inicio y periodo_fin del formulario de rentas.
 
-    Retorna:
-        HttpResponse: Descarga directa del archivo PDF si la generación
-        es exitosa, o redirige al panel de reportes con mensaje de error si falla.
+    @return HttpResponse Descarga directa del archivo PDF si la generación
+    es exitosa, o redirige al panel de reportes con mensaje de error si falla.
     """
     if request.method == 'POST':
         form = ReporteRentasForm(request.POST)
@@ -164,18 +158,16 @@ def generar_rentas(request):
 @admin_required
 def comprobante_renta(request, pk):
     """
-    Genera y descarga el comprobante PDF completo de una renta específica.
+    @brief Genera y descarga el comprobante PDF completo de una renta específica.
 
-    Incluye datos del cliente, equipos rentados, fechas, resumen financiero
+    @details Incluye datos del cliente, equipos rentados, fechas, resumen financiero
     y —si la renta está finalizada— la información de devolución y condición
     del equipo.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
-        pk (int): Identificador único de la renta.
+    @param request HttpRequest Solicitud HTTP.
+    @param pk int Identificador único de la renta.
 
-    Retorna:
-        HttpResponse: Descarga directa del archivo PDF del comprobante.
+    @return HttpResponse Descarga directa del archivo PDF del comprobante.
     """
     renta = get_object_or_404(
         Renta.objects
@@ -197,7 +189,6 @@ def comprobante_renta(request, pk):
 
     except Exception:
         messages.error(request, 'Error al generar el comprobante de la renta.')
-        # Redirigir al detalle correcto según el estado
         if renta.estado == 'activa':
             return redirect('rentas:detalle', pk=pk)
         return redirect('historial:detalle', pk=pk)
@@ -206,19 +197,17 @@ def comprobante_renta(request, pk):
 @admin_required
 def descargar_pdf(request, pk):
     """
-    Regenera y descarga un reporte PDF previamente registrado en el historial.
+    @brief Regenera y descarga un reporte PDF previamente registrado en el historial.
 
-    Recupera los metadatos del reporte y lo regenera con los datos actuales
+    @details Recupera los metadatos del reporte y lo regenera con los datos actuales
     del sistema, sin almacenar el archivo físico, según lo definido en
     RF-25 y CU-25 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
-        pk (int): Identificador único del reporte a descargar.
+    @param request HttpRequest Solicitud HTTP.
+    @param pk int Identificador único del reporte a descargar.
 
-    Retorna:
-        HttpResponse: Descarga directa del archivo PDF regenerado si es exitoso,
-        o redirige al historial de reportes con mensaje de error si falla.
+    @return HttpResponse Descarga directa del archivo PDF regenerado si es exitoso,
+    o redirige al historial de reportes con mensaje de error si falla.
     """
     reporte = get_object_or_404(ReporteGenerado, pk=pk)
 
@@ -256,18 +245,16 @@ def descargar_pdf(request, pk):
 @admin_required
 def historial_reportes(request):
     """
-    Muestra el listado completo de reportes generados anteriormente.
+    @brief Muestra el listado completo de reportes generados anteriormente.
 
-    Presenta todos los reportes registrados en el historial ordenados por
+    @details Presenta todos los reportes registrados en el historial ordenados por
     fecha de generación descendente, permitiendo identificarlos por tipo,
     fecha y periodo cubierto, según lo definido en RF-25 y CU-26 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
+    @param request HttpRequest Solicitud HTTP.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla reportes/historial.html con
-        el listado completo de reportes generados.
+    @return HttpResponse Renderiza la plantilla reportes/historial.html con
+    el listado completo de reportes generados.
     """
     reportes = ReporteGenerado.objects.select_related(
         'generado_por'

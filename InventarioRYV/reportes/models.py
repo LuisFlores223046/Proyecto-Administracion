@@ -13,22 +13,20 @@ from django.db import models
 
 class ReporteGenerado(models.Model):
     """
-    Registro de metadatos de un reporte PDF generado por el Administrador.
+    @class ReporteGenerado
+    @brief Registro de metadatos de un reporte PDF generado por el Administrador.
 
-    No almacena el archivo físico, solo la información necesaria para
+    @details No almacena el archivo físico, solo la información necesaria para
     identificarlo y regenerarlo bajo demanda desde el historial de reportes,
     según lo definido en RF-25 del SRS.
 
-    Atributos:
-        tipo (str): Tipo de reporte generado. Puede ser 'inventario'
-        o 'rentas' (rentas por periodo).
-        generado_por (Usuario): Usuario Administrador que generó el reporte.
-        fecha_generacion (datetime): Fecha y hora en que se generó el reporte.
-        periodo_inicio (date): Fecha de inicio del periodo cubierto por el reporte.
-        Solo aplica para reportes de tipo 'rentas'. Campo opcional.
-        periodo_fin (date): Fecha de fin del periodo cubierto por el reporte.
-        Solo aplica para reportes de tipo 'rentas'. Campo opcional.
-        archivo_nombre (str): Nombre descriptivo del archivo PDF generado.
+    @attributes
+        tipo (str): Tipo de reporte generado ('inventario' o 'rentas').
+        generado_por (Usuario): Usuario administrador que generó el reporte.
+        fecha_generacion (datetime): Fecha y hora de creación del registro.
+        periodo_inicio (date): Inicio del periodo reportado (solo aplica a rentas).
+        periodo_fin (date): Fin del periodo reportado (solo aplica a rentas).
+        archivo_nombre (str): Nombre del archivo PDF asociado al reporte.
     """
 
     TIPO_CHOICES = [
@@ -72,11 +70,10 @@ class ReporteGenerado(models.Model):
 
     def __str__(self):
         """
-        Retorna la representación en texto del reporte generado.
+        @brief Retorna la representación en texto del reporte generado.
 
-        Retorna:
-            str: Cadena con el tipo de reporte y la fecha y hora de generación
-            en formato YYYY-MM-DD HH:MM.
+        @return str Cadena con el tipo de reporte y la fecha y hora de generación
+        en formato YYYY-MM-DD HH:MM.
         """
         return (
             f"{self.get_tipo_display()} — "
