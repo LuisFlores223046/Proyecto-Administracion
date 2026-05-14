@@ -25,18 +25,16 @@ from inventario.models import Equipo
 @admin_required
 def dashboard_admin(request):
     """
-    Muestra el panel principal del Administrador con métricas generales del sistema.
+    @brief Muestra el panel principal del Administrador con métricas generales del sistema.
 
-    Calcula y presenta indicadores sobre el estado del inventario, las rentas
+    @details Calcula y presenta indicadores sobre el estado del inventario, las rentas
     activas, las alertas de vencimiento y las solicitudes pendientes,
     según lo definido en RF-27 y CU-27 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
+    @param request HttpRequest Solicitud HTTP.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla panel_admin/dashboard.html
-        con el contexto de métricas generales del sistema.
+    @return HttpResponse Renderiza la plantilla panel_admin/dashboard.html
+    con el contexto de métricas generales del sistema.
     """
     hoy = date.today()
     limite = hoy + timedelta(days=3)
@@ -44,7 +42,6 @@ def dashboard_admin(request):
     equipos_activos = Equipo.objects.filter(activo=True)
     total_equipos = equipos_activos.count()
 
-    # estado es propiedad; filtrar con anotaciones ORM
     equipos_disponibles = equipos_activos.annotate(
         calc_disp=ExpressionWrapper(
             F('cantidad_total')
@@ -104,17 +101,15 @@ def dashboard_admin(request):
 @admin_required
 def lista_usuarios(request):
     """
-    Muestra el listado de todos los usuarios registrados en el sistema.
+    @brief Muestra el listado de todos los usuarios registrados en el sistema.
 
-    Presenta nombre de usuario, rol y fecha de registro de cada usuario,
+    @details Presenta nombre de usuario, rol y fecha de registro de cada usuario,
     según lo definido en RF-26 y CU-28 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
+    @param request HttpRequest Solicitud HTTP.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla panel_admin/usuarios_lista.html
-        con el listado de usuarios ordenado por nombre de usuario.
+    @return HttpResponse Renderiza la plantilla panel_admin/usuarios_lista.html
+    con el listado de usuarios ordenado por nombre de usuario.
     """
     usuarios = Usuario.objects.all().order_by('username')
     return render(
@@ -127,19 +122,17 @@ def lista_usuarios(request):
 @admin_required
 def crear_usuario(request):
     """
-    Gestiona el registro de un nuevo usuario en el sistema.
+    @brief Gestiona el registro de un nuevo usuario en el sistema.
 
-    Solo accesible para el Administrador. Al guardar exitosamente,
+    @details Solo accesible para el Administrador. Al guardar exitosamente,
     el nuevo usuario puede iniciar sesión con las credenciales asignadas,
     según lo definido en RF-28 y CU-29 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. En método POST debe
-        contener los datos del formulario de creación de usuario.
+    @param request HttpRequest Solicitud HTTP. En método POST debe
+    contener los datos del formulario de creación de usuario.
 
-    Retorna:
-        HttpResponse: Redirige al listado de usuarios si el registro
-        es exitoso, o renderiza el formulario con errores si falla.
+    @return HttpResponse Redirige al listado de usuarios si el registro
+    es exitoso, o renderiza el formulario con errores si falla.
     """
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
@@ -163,24 +156,21 @@ def crear_usuario(request):
 @admin_required
 def editar_rol(request, pk):
     """
-    Gestiona el cambio de rol de un usuario existente.
+    @brief Gestiona el cambio de rol de un usuario existente.
 
-    Solo accesible para el Administrador. Impide que el Administrador
+    @details Solo accesible para el Administrador. Impide que el Administrador
     modifique su propio rol, según lo definido en RF-26 y RN-011 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. En método POST debe
-        contener el nuevo rol seleccionado en el formulario.
-        pk (int): Identificador único del usuario a modificar.
+    @param request HttpRequest Solicitud HTTP. En método POST debe
+    contener el nuevo rol seleccionado en el formulario.
+    @param pk int Identificador único del usuario a modificar.
 
-    Retorna:
-        HttpResponse: Redirige al listado de usuarios si el cambio es exitoso
-        o si el Administrador intenta modificar su propio rol, o renderiza
-        el formulario con errores si falla.
+    @return HttpResponse Redirige al listado de usuarios si el cambio es exitoso
+    o si el Administrador intenta modificar su propio rol, o renderiza
+    el formulario con errores si falla.
     """
     usuario = get_object_or_404(Usuario, pk=pk)
 
-    # No puede cambiar su propio rol
     if usuario == request.user:
         messages.error(
             request,
@@ -215,25 +205,22 @@ def editar_rol(request, pk):
 @admin_required
 def eliminar_usuario(request, pk):
     """
-    Gestiona la eliminación de un usuario del sistema.
+    @brief Gestiona la eliminación de un usuario del sistema.
 
-    Aplica las restricciones RN-011 del SRS que impiden eliminar al único
+    @details Aplica las restricciones RN-011 del SRS que impiden eliminar al único
     Administrador registrado en el sistema, y además impide que el
     Administrador elimine su propia cuenta.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST
-        para confirmar y ejecutar la eliminación.
-        pk (int): Identificador único del usuario a eliminar.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST
+    para confirmar y ejecutar la eliminación.
+    @param pk int Identificador único del usuario a eliminar.
 
-    Retorna:
-        HttpResponse: Redirige al listado de usuarios si la eliminación
-        es exitosa o si se viola alguna restricción, o renderiza la
-        plantilla de confirmación si la solicitud es GET.
+    @return HttpResponse Redirige al listado de usuarios si la eliminación
+    es exitosa o si se viola alguna restricción, o renderiza la
+    plantilla de confirmación si la solicitud es GET.
     """
     usuario = get_object_or_404(Usuario, pk=pk)
 
-    # RN-011: no eliminar el único administrador
     if usuario.es_administrador():
         admins_count = Usuario.objects.filter(
             rol='administrador'
@@ -246,7 +233,6 @@ def eliminar_usuario(request, pk):
             )
             return redirect('panel_admin:usuarios')
 
-    # No puede eliminarse a sí mismo
     if usuario == request.user:
         messages.error(
             request,
@@ -274,19 +260,17 @@ def eliminar_usuario(request, pk):
 @admin_required
 def solicitudes_pendientes(request):
     """
-    Muestra el listado de todas las solicitudes pendientes de revisión.
+    @brief Muestra el listado de todas las solicitudes pendientes de revisión.
 
-    Presenta al Administrador las solicitudes enviadas por el Empleado
+    @details Presenta al Administrador las solicitudes enviadas por el Empleado
     con su tipo, equipo o renta involucrada, comentario y fecha,
     según lo definido en RF-27 y CU-19 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP.
+    @param request HttpRequest Solicitud HTTP.
 
-    Retorna:
-        HttpResponse: Renderiza la plantilla panel_admin/solicitudes_lista.html
-        con el listado de solicitudes pendientes ordenadas por fecha de creación
-        descendente.
+    @return HttpResponse Renderiza la plantilla panel_admin/solicitudes_lista.html
+    con el listado de solicitudes pendientes ordenadas por fecha de creación
+    descendente.
     """
     solicitudes = Solicitud.objects.filter(
         estado='pendiente'
@@ -304,29 +288,25 @@ def solicitudes_pendientes(request):
 @admin_required
 def aprobar_solicitud(request, pk):
     """
-    Aprueba y ejecuta una solicitud pendiente enviada por el Empleado.
+    @brief Aprueba y ejecuta una solicitud pendiente enviada por el Empleado.
 
-    Para solicitudes de cierre de renta, redirige al formulario de devolución
+    @details Para solicitudes de cierre de renta, redirige al formulario de devolución
     para capturar la condición del equipo y los datos de pago antes de finalizar.
     Para el resto de tipos, ejecuta la acción correspondiente de forma automática,
     según lo definido en RF-27 y CU-20 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST
-        para confirmar la aprobación.
-        pk (int): Identificador único de la solicitud a aprobar.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST
+    para confirmar la aprobación.
+    @param pk int Identificador único de la solicitud a aprobar.
 
-    Retorna:
-        HttpResponse: Redirige al listado de solicitudes al finalizar,
-        o al detalle de la renta si es una solicitud de cierre.
+    @return HttpResponse Redirige al listado de solicitudes al finalizar,
+    o al detalle de la renta si es una solicitud de cierre.
     """
     solicitud = get_object_or_404(
         Solicitud, pk=pk, estado='pendiente'
     )
 
     if request.method == 'POST':
-        # Cierre de renta: redirigir al formulario completo para capturar
-        # condición del equipo, daños y pago antes de finalizar
         if solicitud.tipo == 'cierre_renta' and solicitud.renta:
             solicitud.estado = 'aprobada'
             solicitud.resuelto_por = request.user
@@ -361,19 +341,17 @@ def aprobar_solicitud(request, pk):
 @admin_required
 def rechazar_solicitud(request, pk):
     """
-    Rechaza una solicitud pendiente sin ejecutar ninguna acción.
+    @brief Rechaza una solicitud pendiente sin ejecutar ninguna acción.
 
-    Marca la solicitud como rechazada y registra al Administrador que
+    @details Marca la solicitud como rechazada y registra al Administrador que
     la resolvió y la fecha de resolución, según lo definido en RF-27
     y CU-21 del SRS.
 
-    Parámetros:
-        request (HttpRequest): Solicitud HTTP. Debe ser de método POST
-        para confirmar el rechazo.
-        pk (int): Identificador único de la solicitud a rechazar.
+    @param request HttpRequest Solicitud HTTP. Debe ser de método POST
+    para confirmar el rechazo.
+    @param pk int Identificador único de la solicitud a rechazar.
 
-    Retorna:
-        HttpResponse: Redirige al listado de solicitudes pendientes.
+    @return HttpResponse Redirige al listado de solicitudes pendientes.
     """
     solicitud = get_object_or_404(
         Solicitud, pk=pk, estado='pendiente'
