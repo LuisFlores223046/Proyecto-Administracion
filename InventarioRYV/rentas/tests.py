@@ -253,14 +253,14 @@ class TestRentaForm:
         }))
         assert not form.is_valid()
 
-    def test_deposito_menor_al_50_invalida(self, db):
+    def test_deposito_bajo_sigue_siendo_valido(self, db):
         from rentas.forms import RentaForm
         form = RentaForm(data=self._datos_base({
             'precio': '1000.00',
-            'deposito': '400.00',
+            'deposito': '10.00',
+            'metodo_pago': 'efectivo',
         }))
-        assert not form.is_valid()
-        assert 'deposito' in form.errors
+        assert form.is_valid(), form.errors
 
     def test_deposito_sin_metodo_pago_invalida(self, db):
         from rentas.forms import RentaForm
@@ -439,14 +439,14 @@ class TestSolicitudRentaForm:
         }))
         assert not form.is_valid()
 
-    def test_deposito_menor_al_50_invalida(self, db):
+    def test_deposito_bajo_sigue_siendo_valido(self, db):
         from rentas.forms import SolicitudRentaForm
         form = SolicitudRentaForm(data=self._datos_base({
             'precio': '1000.00',
-            'deposito': '400.00',
+            'deposito': '10.00',
+            'metodo_pago': 'efectivo',
         }))
-        assert not form.is_valid()
-        assert 'deposito' in form.errors
+        assert form.is_valid(), form.errors
 
     def test_deposito_sin_metodo_pago_invalida(self, db):
         from rentas.forms import SolicitudRentaForm
